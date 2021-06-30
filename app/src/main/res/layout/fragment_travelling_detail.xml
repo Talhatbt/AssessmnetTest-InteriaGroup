@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="distance"
+            type="String" />
+
+        <variable
+            name="title"
+            type="String" />
+
+        <variable
+            name="viewmodel"
+            type="com.assessmenttest.models.TravellingViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white_smoke"
+        android:clickable="true"
+        tools:context=".FirstFragment">
+
+
+        <RelativeLayout
+            android:id="@+id/rlTop"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_40sdp"
+            android:background="@color/forest_green"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elevation="@dimen/_10sdp"
+            android:text="@{title}"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_15sdp"
+            app:layout_constraintBottom_toBottomOf="@id/rlTop"
+            app:layout_constraintEnd_toEndOf="@id/rlTop"
+            app:layout_constraintStart_toStartOf="@id/rlTop"
+            app:layout_constraintTop_toTopOf="@id/rlTop" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btnBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:background="@drawable/ic_baseline_arrow_back_24"
+            android:backgroundTint="@color/white"
+            app:layout_constraintBottom_toBottomOf="@id/rlTop"
+            app:layout_constraintStart_toStartOf="@id/rlTop"
+            app:layout_constraintTop_toTopOf="@id/rlTop" />
+
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_250sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rlTop"
+            tools:context="com.abhiandroid.GoogleMaps.googlemaps.MapsActivity" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvDistance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_5sdp"
+            android:background="@drawable/bg_row"
+            android:elevation="@dimen/_5sdp"
+            android:gravity="center"
+            android:padding="@dimen/_10sdp"
+            android:text="@{@string/distance_covered + distance}"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="@id/map"
+            app:layout_constraintEnd_toEndOf="@id/map"
+            app:layout_constraintStart_toStartOf="@id/map" />
+
+        <RelativeLayout
+            android:id="@+id/cardview"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_220sdp"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:background="@drawable/bg_detail_card"
+            android:elevation="@dimen/_10sdp"
+            app:layout_constraintTop_toBottomOf="@id/map" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvDetails"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_220sdp"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:layout_marginRight="@dimen/_10sdp"
+            android:elevation="@dimen/_10sdp"
+            app:items="@{viewmodel.listOfTravellingDetail}"
+            app:layout_constraintBottom_toBottomOf="@id/cardview"
+            app:layout_constraintEnd_toEndOf="@id/cardview"
+            app:layout_constraintStart_toStartOf="@id/cardview"
+            app:layout_constraintTop_toTopOf="@id/cardview" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnDrawRoute"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginRight="@dimen/_10sdp"
+            android:background="@color/forest_green"
+            android:layout_marginBottom="@dimen/_5sdp"
+            android:text="Find Route"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

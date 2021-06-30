@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="listener"
+            type="com.assessmenttest.common.LastAdapter.OnItemClickListener" />
+
+        <variable
+            name="item"
+            type="com.assessmenttest.models.TravellingData" />
+    </data>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_5sdp"
+        android:elevation="@dimen/_10sdp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <RelativeLayout
+            android:id="@+id/cardview"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_30sdp"
+            app:cardCornerRadius="@dimen/_15sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvNumber"
+            android:layout_width="@dimen/_25sdp"
+            android:layout_height="@dimen/_25sdp"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:background="@drawable/bg_number"
+            android:elevation="@dimen/_10sdp"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_13sdp"
+            app:layout_constraintBottom_toBottomOf="@id/cardview"
+            app:layout_constraintStart_toStartOf="@id/cardview"
+            app:layout_constraintTop_toTopOf="@id/cardview"
+            app:setNumberBg="@{item.id.toString()}"
+            tools:text="1" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvStreetName"
+            android:layout_width="@dimen/_120sdp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:elevation="@dimen/_10sdp"
+            android:maxLength="30"
+            android:maxLines="2"
+            android:text="@{item.street}"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_12sdp"
+            app:layout_constraintBottom_toBottomOf="@id/cardview"
+            app:layout_constraintStart_toEndOf="@id/tvNumber"
+            app:layout_constraintTop_toTopOf="@id/cardview"
+            tools:text="Aldere" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvPostalCode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:elevation="@dimen/_10sdp"
+            android:text="@{item.postalCode}"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_13sdp"
+            app:layout_constraintBottom_toBottomOf="@id/cardview"
+            app:layout_constraintStart_toEndOf="@id/tvStreetName"
+            app:layout_constraintTop_toTopOf="@id/cardview"
+            tools:text="45-ioc" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvCity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:elevation="@dimen/_10sdp"
+            android:maxLines="3"
+            android:text="@{item.city}"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_12sdp"
+            app:layout_constraintBottom_toBottomOf="@id/cardview"
+            app:layout_constraintStart_toEndOf="@id/tvPostalCode"
+            app:layout_constraintTop_toTopOf="@id/cardview"
+            tools:text="Lodx" />
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_1sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:background="@color/gray"
+            app:layout_constraintEnd_toEndOf="@id/cardview"
+            app:layout_constraintStart_toStartOf="@id/cardview"
+            app:layout_constraintTop_toBottomOf="@id/tvStreetName" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
