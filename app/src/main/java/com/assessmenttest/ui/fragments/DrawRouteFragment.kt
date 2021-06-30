@@ -150,6 +150,7 @@ class DrawRouteFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.Connec
 
     private fun setMarkersOnGoogleMap(listOfPoints: MutableList<TravellingData>) {
 
+        var size=listOfPoints.size-1
         val markerOptionStart = MarkerOptions()
         listOfPoints[0].geoPoints?.let { markerOptionStart.position(it) }
         markerOptionStart.title(listOfPoints[0].postalCode)
@@ -161,19 +162,19 @@ class DrawRouteFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.Connec
         mMap?.addMarker(markerOptionStart)
 
         val markerOptionEnd = MarkerOptions()
-        listOfPoints[1].geoPoints?.let { markerOptionEnd.position(it) }
-        markerOptionEnd.title(listOfPoints[1].postalCode)
-        mMap?.animateCamera(CameraUpdateFactory.newLatLng(listOfPoints[1].geoPoints))
+        listOfPoints[size].geoPoints?.let { markerOptionEnd.position(it) }
+        markerOptionEnd.title(listOfPoints[size].postalCode)
+        mMap?.animateCamera(CameraUpdateFactory.newLatLng(listOfPoints[size].geoPoints))
         circleDrawable = resources.getDrawable(R.drawable.circle_shape)
         markerIcon = Utils.getMarkerIconFromDrawable(circleDrawable)
-        markerOptionEnd.title(listOfPoints[1].id.toString())
+        markerOptionEnd.title(listOfPoints[size].id.toString())
         markerOptionEnd.icon(markerIcon)
         mMap?.addMarker(markerOptionEnd)
     }
 
 
     private fun moveCamera(latLng: LatLng) {
-        mMap?.animateCamera(CameraUpdateFactory.zoomTo(11f))
-//        mMap?.moveCamera(CameraUpdateFactory.newLatLng(latLng))
+        mMap?.moveCamera(CameraUpdateFactory.newLatLng(latLng))
+        mMap?.animateCamera(CameraUpdateFactory.zoomTo(6f))
     }
 }

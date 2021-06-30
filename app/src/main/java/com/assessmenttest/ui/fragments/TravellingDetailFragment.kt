@@ -227,12 +227,12 @@ class TravellingDetailFragment : Fragment(), OnMapReadyCallback, ConnectionCallb
                 override fun onItemClick(model: TravellingData) {
 
                     var distanceCovered = 0.0
-                    var totalSize = viewModel.listOfTravellingDetail.get()?.size!! - 1
+                    var totalSize = viewModel.listOfTravellingDetail.get()?.size!!
                     if (model.id?.toInt()!! < totalSize!!) {
                         distanceCovered =
                             viewModel.listOfTravellingDetail.get()?.let {
                                 Utils.calculateDistanceBetweenDestinations(
-                                    it, model.id!!.toInt()
+                                    it, model.id!!.toInt()-1
                                 )
                             }!!
 
@@ -241,8 +241,8 @@ class TravellingDetailFragment : Fragment(), OnMapReadyCallback, ConnectionCallb
                                 .toString() + "km"
 
                         var location =
-                            viewModel.listOfTravellingDetail.get()!![model.id!!.toInt()].city + " - " +
-                                    viewModel.listOfTravellingDetail.get()!![model.id!!.toInt() + 1].city
+                            viewModel.listOfTravellingDetail.get()!![model.id!!.toInt()-1].city + " - " +
+                                    viewModel.listOfTravellingDetail.get()!![model.id!!.toInt()].city
                         CallDialogs.INSTANCE.showDistanceDialog(requireContext(),
                             value.toString(),
                             location,
