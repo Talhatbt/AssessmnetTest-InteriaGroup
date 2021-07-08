@@ -35,15 +35,6 @@ enum class CallDialogs {
         }
     }
 
-    private fun showDialog() {
-        try {
-            if (null != mDialog) {
-                mDialog!!.show()
-            }
-        } catch (ex: Exception) {
-            ex.printStackTrace()
-        }
-    }
 
     val isShowing: Boolean
         get() = null != mDialog && mDialog!!.isShowing
@@ -71,6 +62,47 @@ enum class CallDialogs {
         tvLocation.text = location
         btnOk.setOnClickListener(onAttemptClickListener)
         mDialog!!.setCancelable(false)
+        showDialog()
+    }
+
+    /**
+     * Dismisses dialog
+     *
+     * @param dialog current dialog instance
+     */
+    fun dismissDialog(dialog: Dialog?) {
+        try {
+            if (null != dialog && dialog.isShowing) {
+                dialog.dismiss()
+            }
+        } catch (e: IllegalArgumentException) {
+            e.printStackTrace()
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
+    }
+
+    private fun showDialog() {
+        try {
+            if (null != mDialog) {
+                if (mDialog!!.isShowing) {
+                    mDialog?.dismiss()
+                }
+                mDialog?.show()
+            }
+        } catch (e: IllegalArgumentException) {
+            e.printStackTrace()
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
+    }
+
+    fun showLoader(context: Context?) {
+        if (null != mDialog && mDialog!!.isShowing) return
+        dismissDialog()
+        mDialog = Dialog(context!!, R.style.actionSheetTheme)
+        mDialog?.setContentView(R.layout.loading)
+        mDialog?.setCancelable(false)
         showDialog()
     }
 }

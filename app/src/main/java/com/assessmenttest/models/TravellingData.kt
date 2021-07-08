@@ -34,28 +34,9 @@ class TravellingData(
     @ColumnInfo(name = "city")
     var city: String? = "",
 
-    @NonNull
-    @ColumnInfo(name = "extra")
-    var extra: String? = "",
-
     @Ignore
     var geoPoints: LatLng? = null,
 
     @Ignore
     var totalDistanceCovered: Double? = 0.0
-) {
-
-    suspend fun getTravelDataByDate(date: String): MutableList<TravellingData> {
-        var list = ArrayList<TravellingData>()
-//        fetchData(date)
-        return list
-    }
-
-
-    suspend fun fetchData(date: String): MutableList<TravellingData> {
-        return GlobalScope.async {
-            AppDatabase.getDatabase(MainApp.getContext()).travelDao()
-                ?.getTravelListByDate(date) as ArrayList<TravellingData>
-        }.await()
-    }
-}
+)

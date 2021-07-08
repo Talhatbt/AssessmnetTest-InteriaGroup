@@ -8,7 +8,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.Drawable
-import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -24,6 +23,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.assessmenttest.R
 import com.assessmenttest.common.LastAdapter
+import com.assessmenttest.common.SimpleCallback
 import com.assessmenttest.constants.Consts
 import com.assessmenttest.databinding.FragmentTravellingDetailBinding
 import com.assessmenttest.extensions.bindViewModel
@@ -32,27 +32,24 @@ import com.assessmenttest.extensions.replaceFragment
 import com.assessmenttest.helper.CallDialogs
 import com.assessmenttest.models.TravellingData
 import com.assessmenttest.models.TravellingViewModel
+import com.assessmenttest.ui.MainActivity
 import com.assessmenttest.utility.Utils
-import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks
-import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
+import kotlinx.android.synthetic.main.activity_main.*
 import java.text.DecimalFormat
 
-class TravellingDetailFragment : Fragment(), OnMapReadyCallback, ConnectionCallbacks,
-    OnConnectionFailedListener,
-    com.google.android.gms.location.LocationListener {
+class TravellingDetailFragment : Fragment() {
 
     lateinit var travelDetailsAdapter: LastAdapter<TravellingData>
     private val viewModel by bindViewModel<TravellingViewModel>()
 
+    lateinit var callback: SimpleCallback<Any>
     private var mMap: GoogleMap? = null
     lateinit var binding: FragmentTravellingDetailBinding
     var mapFragment: SupportMapFragment? = null
@@ -71,19 +68,26 @@ class TravellingDetailFragment : Fragment(), OnMapReadyCallback, ConnectionCallb
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        requireActivity().toolbar.visibility=View.GONE
         binding.distance = getString(R.string.loading)
         setListener()
         setRecyclerview()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            checkLocationPermission()
+//            checkLocationPermission()
         }
 
-        mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+//        mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         viewModel.getTravelDates(date)
         binding.title = date
     }
 
     private fun setListener() {
+
+        viewModel.isApiCalling.observe(requireActivity(), Observer {
+            if (it) CallDialogs.INSTANCE.showLoader(activity)
+            else CallDialogs.INSTANCE.dismissDialog()
+        })
+
 
         // set observer for travel list data
         viewModel.travelDataList.observe(requireActivity(), Observer {
@@ -99,7 +103,7 @@ class TravellingDetailFragment : Fragment(), OnMapReadyCallback, ConnectionCallb
                 }
 
                 // Call function to setup markers on available LatLng
-                setMarkersOnGoogleMap(travelList)
+//                setMarkersOnGoogleMap(travelList)
 
                 viewModel.listOfTravellingDetail.set(travelList)
 
@@ -125,6 +129,7 @@ class TravellingDetailFragment : Fragment(), OnMapReadyCallback, ConnectionCallb
                 var value = DecimalFormat("##.##").format(totalDistance?.div(1000.0)).toDouble()
                 binding.distance = "$value km"
                 Log.e("total covered", totalDistance.toString())
+                showDetail()
             }
         })
 
@@ -137,42 +142,31 @@ class TravellingDetailFragment : Fragment(), OnMapReadyCallback, ConnectionCallb
         }
     }
 
-    override fun onMapReady(map: GoogleMap?) {
-        mMap = map
-        mMap?.mapType = GoogleMap.MAP_TYPE_NORMAL
-        mMap?.uiSettings?.isZoomControlsEnabled = true
-        mMap?.uiSettings?.isZoomGesturesEnabled = true
-        mMap?.uiSettings?.isCompassEnabled = true
-        //Initialize Google Play Services
-        if (ContextCompat.checkSelfPermission(
-                requireActivity(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            mMap?.isMyLocationEnabled = true
-        }
-    }
+//    override fun onMapReady(map: GoogleMap?) {
+//        mMap = map
+//        mMap?.mapType = GoogleMap.MAP_TYPE_NORMAL
+//        mMap?.uiSettings?.isZoomControlsEnabled = true
+//        mMap?.uiSettings?.isZoomGesturesEnabled = true
+//        mMap?.uiSettings?.isCompassEnabled = true
+//        //Initialize Google Play Services
+//        if (ContextCompat.checkSelfPermission(
+//                requireActivity(),
+//                Manifest.permission.ACCESS_FINE_LOCATION
+//            ) == PackageManager.PERMISSION_GRANTED
+//        ) {
+//            mMap?.isMyLocationEnabled = true
+//        }
+//    }
 
-    override fun onConnected(p0: Bundle?) {
-    }
-
-    override fun onConnectionSuspended(p0: Int) {
-    }
-
-    override fun onConnectionFailed(p0: ConnectionResult) {
-    }
-
-    override fun onLocationChanged(p0: Location?) {
-    }
 
     @SuppressLint("RestrictedApi")
     override fun onResume() {
         super.onResume()
-        if (Utils.isLocationEnabled(requireContext())) {
-            mapFragment?.getMapAsync(this)
-        } else {
-            displayPromptForEnablingGPS(requireActivity())
-        }
+//        if (Utils.isLocationEnabled(requireContext())) {
+//            mapFragment?.getMapAsync(this)
+//        } else {
+//            displayPromptForEnablingGPS(requireActivity())
+//        }
     }
 
     private fun displayPromptForEnablingGPS(activity: Activity) {
@@ -225,31 +219,6 @@ class TravellingDetailFragment : Fragment(), OnMapReadyCallback, ConnectionCallb
             R.layout.layout_row_travel_detail,
             object : LastAdapter.OnItemClickListener<TravellingData> {
                 override fun onItemClick(model: TravellingData) {
-
-                    var distanceCovered = 0.0
-                    var totalSize = viewModel.listOfTravellingDetail.get()?.size!!
-                    if (model.id?.toInt()!! < totalSize!!) {
-                        distanceCovered =
-                            viewModel.listOfTravellingDetail.get()?.let {
-                                Utils.calculateDistanceBetweenDestinations(
-                                    it, model.id!!.toInt()-1
-                                )
-                            }!!
-
-                        var value =
-                            DecimalFormat("##.##").format(distanceCovered?.div(1000.0)).toDouble()
-                                .toString() + "km"
-
-                        var location =
-                            viewModel.listOfTravellingDetail.get()!![model.id!!.toInt()-1].city + " - " +
-                                    viewModel.listOfTravellingDetail.get()!![model.id!!.toInt()].city
-                        CallDialogs.INSTANCE.showDistanceDialog(requireContext(),
-                            value.toString(),
-                            location,
-                            View.OnClickListener {
-                                CallDialogs.INSTANCE.dismissDialog()
-                            })
-                    }
                 }
             })
 
@@ -258,10 +227,10 @@ class TravellingDetailFragment : Fragment(), OnMapReadyCallback, ConnectionCallb
 
     companion object {
         @JvmStatic
-        fun newInstance(date: String): TravellingDetailFragment {
-
+        fun newInstance(date: String,callback: SimpleCallback<Any>): TravellingDetailFragment {
             val fragment = TravellingDetailFragment()
             fragment.date = date
+            fragment.callback = callback
             return fragment
         }
     }
@@ -305,5 +274,38 @@ class TravellingDetailFragment : Fragment(), OnMapReadyCallback, ConnectionCallb
     private fun moveCamera(latLng: LatLng) {
         mMap?.moveCamera(CameraUpdateFactory.newLatLng(latLng))
         mMap?.animateCamera(CameraUpdateFactory.zoomTo(6f))
+    }
+
+    fun showDetail() {
+
+        var distanceCovered = 0.0
+        var totalSize = viewModel.listOfTravellingDetail.get()?.size!!
+
+        var location = ""
+
+        viewModel.listOfTravellingDetail.get()?.forEachIndexed { index, element ->
+            if (element.id?.toInt()!! < totalSize!!) {
+                distanceCovered =
+                    viewModel.listOfTravellingDetail.get()?.let {
+                        Utils.calculateDistanceBetweenDestinations(
+                            it, element.id!!.toInt() - 1
+                        )
+                    }!!
+
+                var value =
+                    DecimalFormat("##.##").format(distanceCovered?.div(1000.0)).toDouble()
+                        .toString() + " km"
+
+                location = location +
+                        viewModel.listOfTravellingDetail.get()!![element.id!!.toInt() - 1].city + " - " +
+                        viewModel.listOfTravellingDetail.get()!![element.id!!.toInt()].city + " - $value \n"
+            }
+        }
+        binding.tvDetails.text = location
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        callback.onCallBack(ArrayList())
     }
 }

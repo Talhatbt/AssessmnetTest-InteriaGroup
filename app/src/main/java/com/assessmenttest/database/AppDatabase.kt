@@ -20,7 +20,6 @@ abstract class AppDatabase : RoomDatabase() {
 
 
         fun getDatabase(context: Context): AppDatabase {
-            copyAttachedDatabase(context, DB_NAME)
             if (INSTANCE == null) {
                 synchronized(AppDatabase::class.java) {
                     if (INSTANCE == null) {
@@ -69,7 +68,4 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
     }
-
-
-
 }

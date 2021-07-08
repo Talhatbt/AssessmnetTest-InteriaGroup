@@ -8,6 +8,11 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.multidex.MultiDexApplication;
 
+import com.assessmenttest.utility.Utils;
+
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+
 public class MainApp extends MultiDexApplication implements Application.ActivityLifecycleCallbacks {
 
 

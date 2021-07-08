@@ -3,7 +3,6 @@ package com.assessmenttest.models
 import androidx.databinding.ObservableField
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.android.volley.RequestQueue
 import com.assessmenttest.R
 import com.assessmenttest.database.AppDatabase
 import com.assessmenttest.models.directionapi.DirectionApiResponse
@@ -16,9 +15,12 @@ import kotlin.coroutines.CoroutineContext
 
 class TravellingViewModel : ViewModel(), CoroutineScope {
 
-    private var mRequestQueue: RequestQueue? = null
+    val isApiCalling = MutableLiveData<Boolean>().apply { value = false }
+
     private val job = Job()
     var travelDataList: MutableLiveData<MutableList<TravellingData>> = MutableLiveData()
+    var allDateList: MutableLiveData<MutableList<TravellingData>> = MutableLiveData()
+
     var directionApiResponse: MutableLiveData<DirectionApiResponse> = MutableLiveData()
 
     var listOfTravellingDates =
@@ -30,12 +32,15 @@ class TravellingViewModel : ViewModel(), CoroutineScope {
         get() = job + Dispatchers.Main
 
     fun getTravelDates(date: String) {
+
+        isApiCalling.value=true
         launch(Dispatchers.Main) {
             val list: MutableList<TravellingData> = async(Dispatchers.IO) {
                 AppDatabase.getDatabase(MainApp.getContext()).travelDao()
                     ?.getTravelListByDate(date) as ArrayList<TravellingData>
             }.await()
             travelDataList.value = list
+            isApiCalling.value=false
         }
     }
 
@@ -63,5 +68,19 @@ class TravellingViewModel : ViewModel(), CoroutineScope {
 
                 }
             })
+    }
+
+    fun fetchTravellingData() {
+        GlobalScope.launch(Dispatchers.IO) {
+            var list = AppDatabase.getDatabase(MainApp.getContext()).travelDao()?.getDates()!!
+            listOfTravellingDates.set(list)
+        }
+    }
+
+    fun fetchAllData() {
+        GlobalScope.launch(Dispatchers.IO) {
+            var list = AppDatabase.getDatabase(MainApp.getContext()).travelDao()?.getAll()!!
+            allDateList.postValue(list)
+        }
     }
 }

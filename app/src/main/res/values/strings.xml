@@ -7,6 +7,7 @@
     <string name="next">Next</string>
     <string name="previous">Previous</string>
     <string name="loading">loading...</string>
+    <string name="km">\u0020km</string>
     <string name="distance_covered">Total Distance Covered: \u0020</string>
 
     <string name="api_key">AIzaSyC42_NfibGRYCUsZjzIGDwkA1QkwRGXQn4</string>

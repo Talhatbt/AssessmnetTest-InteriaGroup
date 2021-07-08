@@ -28,7 +28,7 @@
         <RelativeLayout
             android:id="@+id/rlTop"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_40sdp"
+            android:layout_height="@dimen/_35sdp"
             android:background="@color/forest_green"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -58,15 +58,16 @@
             app:layout_constraintStart_toStartOf="@id/rlTop"
             app:layout_constraintTop_toTopOf="@id/rlTop" />
 
-        <fragment
-            android:id="@+id/map"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_250sdp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/rlTop"
-            tools:context="com.abhiandroid.GoogleMaps.googlemaps.MapsActivity" />
+        <!--  <fragment
+              android:id="@+id/map"
+              android:name="com.google.android.gms.maps.SupportMapFragment"
+              android:layout_width="match_parent"
+              android:layout_height="@dimen/_250sdp"
+              app:layout_constraintEnd_toEndOf="parent"
+              app:layout_constraintStart_toStartOf="parent"
+              app:layout_constraintTop_toBottomOf="@id/rlTop"
+              android:visibility="gone"
+              tools:context="com.abhiandroid.GoogleMaps.googlemaps.MapsActivity" />-->
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvDistance"
@@ -79,26 +80,30 @@
             android:padding="@dimen/_10sdp"
             android:text="@{@string/distance_covered + distance}"
             android:textColor="@color/black"
-            app:layout_constraintBottom_toBottomOf="@id/map"
-            app:layout_constraintEnd_toEndOf="@id/map"
-            app:layout_constraintStart_toStartOf="@id/map" />
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/rlTop"
+            app:layout_constraintEnd_toEndOf="@id/rlTop"
+            app:layout_constraintStart_toStartOf="@id/rlTop" />
 
         <RelativeLayout
             android:id="@+id/cardview"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_220sdp"
+            android:layout_height="@dimen/_300sdp"
             android:layout_marginStart="@dimen/_10sdp"
             android:layout_marginTop="@dimen/_10sdp"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:layout_marginBottom="@dimen/_10sdp"
             android:background="@drawable/bg_detail_card"
             android:elevation="@dimen/_10sdp"
-            app:layout_constraintTop_toBottomOf="@id/map" />
+            app:layout_constraintTop_toBottomOf="@id/rlTop" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvDetails"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_220sdp"
+            android:layout_height="@dimen/_300sdp"
             android:layout_marginStart="@dimen/_10sdp"
             android:layout_marginTop="@dimen/_5sdp"
+            android:layout_marginEnd="@dimen/_10sdp"
             android:layout_marginRight="@dimen/_10sdp"
             android:elevation="@dimen/_10sdp"
             app:items="@{viewmodel.listOfTravellingDetail}"
@@ -113,12 +118,24 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/_10sdp"
             android:layout_marginRight="@dimen/_10sdp"
-            android:background="@color/forest_green"
             android:layout_marginBottom="@dimen/_5sdp"
+            android:background="@color/forest_green"
             android:text="Find Route"
             android:textColor="@color/white"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/_12sdp"
+            android:elevation="@dimen/_10sdp"
+            android:text="@string/app_name"
+            android:layout_margin="@dimen/_10sdp"
+            android:textColor="@color/black"
+            app:layout_constraintTop_toBottomOf="@id/cardview"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

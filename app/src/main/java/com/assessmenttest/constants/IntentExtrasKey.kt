@@ -1,4 +1,4 @@
-package co.cozygaming.braintest.constants
+package com.assessmenttest.constants
 
 object IntentExtrasKey {
     const val TEST_STATE = "TEST_STATE"

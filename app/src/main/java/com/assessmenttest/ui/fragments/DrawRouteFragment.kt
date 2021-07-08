@@ -29,6 +29,9 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 
+/*
+*  This class used to draw route on Map by putting LatLng
+* */
 class DrawRouteFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
     GoogleApiClient.OnConnectionFailedListener,
     com.google.android.gms.location.LocationListener {

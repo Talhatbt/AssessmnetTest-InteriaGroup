@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="listener"
+            type="com.assessmenttest.common.LastAdapter.OnItemClickListener" />
+
+        <variable
+            name="item"
+            type="com.assessmenttest.models.DestinationModel" />
+    </data>
+
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_5sdp"
+        android:elevation="@dimen/_10sdp"
+        android:orientation="horizontal">
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_5sdp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@{item.date}"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_12sdp"
+            tools:text="14/33/333" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTotalDistance"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_5sdp"
+            android:layout_weight="1"
+            android:elevation="@dimen/_10sdp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:gravity="center"
+            android:singleLine="true"
+            android:text="@{item.distance + @string/km}"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_11sdp"
+            tools:text="Lodx" />
+
+    </LinearLayout>
+</layout>

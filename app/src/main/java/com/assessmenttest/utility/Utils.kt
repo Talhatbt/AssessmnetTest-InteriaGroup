@@ -1,102 +1,100 @@
 package com.assessmenttest.utility
 
-import android.annotation.SuppressLint
+import android.content.ContentResolver
 import android.content.Context
-import android.content.SharedPreferences
+import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
+import android.net.Uri
 import android.os.Build
+import android.provider.OpenableColumns
 import android.provider.Settings
 import android.provider.Settings.SettingNotFoundException
 import android.text.TextUtils
 import android.util.DisplayMetrics
-import android.widget.Toast
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKeys
+import android.util.Log
+import android.webkit.MimeTypeMap
 import androidx.sqlite.db.SimpleSQLiteQuery
+import com.assessmenttest.constants.Consts
 import com.assessmenttest.database.AppDatabase
+import com.assessmenttest.interfaces.StringCallBack
 import com.assessmenttest.models.TravellingData
 import com.assessmenttest.ui.MainApp
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.vision.barcode.Barcode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
-import org.w3c.dom.Document
-import org.w3c.dom.Node
-import org.w3c.dom.NodeList
 import java.io.*
-import java.security.GeneralSecurityException
-import javax.xml.parsers.DocumentBuilder
-import javax.xml.parsers.DocumentBuilderFactory
+import java.text.ParseException
+import java.text.SimpleDateFormat
 
 
 object Utils {
 
-    @Throws(GeneralSecurityException::class, IOException::class)
-    fun getEncryptedSharedPreferences(): SharedPreferences? {
-        val masterKeyAlias: String = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
-        return EncryptedSharedPreferences.create(
-            "com.assessment.preferences",
-            masterKeyAlias,
-            MainApp.getContext(),
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+    /*
+    *  This method will import the CSV into local database
+    * */
+    fun importCSVFromFile(){
+
+        var file = File(
+            MainApp.getContext().filesDir
+                .toString() + "/" + Consts.FILE_NAME
         )
-    }
 
-    fun importCSV() {
+        val targetStream: InputStream = FileInputStream(file)
         var reader =
-            BufferedReader(InputStreamReader(MainApp.getContext().assets?.open("assessment.csv")));
-
+            BufferedReader(InputStreamReader(targetStream))
         val csvReader =
             CSVReader(reader)/* path of local storage (it should be your csv file locatioin)*/
         var nextLine: Array<String>? = null
-        var count = 0
-        val columns = StringBuilder()
+        var rowCount = 0
         GlobalScope.launch(Dispatchers.IO) {
             do {
-                val value = StringBuilder()
+                var value = ""
                 nextLine = csvReader.readNext()
+                nextLine?.toMutableList()
                 nextLine?.let { nextLine ->
-                    for (i in 1 until nextLine.size - 1) {
-                        if (count == 0) {                             // the count==0 part only read
-                            if (i == nextLine.size - 2) {             //your csv file column name
-                                columns.append(nextLine[i])
-                                count = 1
-                            } else
-                                columns.append(nextLine[i]).append(",")
-                        } else {                         // this part is for reading value of each row
-                            if (i == nextLine.size - 2) {
-                                value.append("'").append(nextLine[i]).append("'")
-                                count = 2
-                            } else
-                                value.append("'").append(nextLine[i]).append("',")
+
+                    if (rowCount == 0) {
+                        // this part is for reading colum of each row
+                        var column = nextLine?.joinToString(
+                            separator = ","
+                        )
+                    } else {
+                        // this part is for reading value of each row
+                        value = nextLine?.joinToString(
+                            prefix = "'",
+                            separator = "','",
+                            postfix = "'"
+                        )
+                    }
+
+                    if (rowCount >= 1) {
+                        if (!value.isNullOrEmpty()) {
+                            var convertedString = nextLine?.joinToString(
+                                prefix = "'",
+                                separator = "','",
+                                postfix = "'"
+                            )
+                            pushTravellingData(
+                                values = convertedString
+                            )
                         }
                     }
-                    if (count == 2) {
-                        if (!value.isNullOrEmpty())
-                            pushCustomerData(
-                                columns,
-                                value
-                            )//write here your code to insert all values
-                    }
                 }
+                rowCount++
             } while ((nextLine) != null)
         }
-
-        Toast.makeText(MainApp.getContext(), "Imported SuccessFully", Toast.LENGTH_SHORT).show()
     }
 
-    private suspend fun pushCustomerData(columns: StringBuilder, values: StringBuilder) =
+    private suspend fun pushTravellingData(columns: StringBuilder? = null, values: String? = null) =
         withContext(Dispatchers.IO) {
             val query = SimpleSQLiteQuery(
                 "INSERT INTO travelling (date,street,postal_code,city) values($values)",
@@ -131,6 +129,9 @@ object Utils {
     }
 
 
+    /*
+    * This method will return the full geocoding addresss
+    * */
     fun getLocationFromAddress(context: Context?, strAddress: String?): LatLng? {
         val coder = Geocoder(context)
         val address: List<Address>?
@@ -164,6 +165,9 @@ object Utils {
         return BitmapDescriptorFactory.fromBitmap(bitmap)
     }
 
+    /*
+    *  Calculate distance between two geopoints
+    * */
     fun calculateDistance(
         startLatLng: LatLng,
         endLatLng: LatLng,
@@ -179,40 +183,6 @@ object Utils {
         endPoint.longitude = endLatLng.longitude
 
         return startPoint.distanceTo(endPoint).toDouble()
-    }
-
-    @SuppressLint("RestrictedApi")
-    fun parseLocationResult(result: JSONObject): ArrayList<Any> {
-
-        val tag = arrayOf("lat", "lng")
-        var listOfGeopoints = ArrayList<Any>()
-        val str: String = result.toString()
-        val input: InputStream = ByteArrayInputStream(str.toByteArray())
-        val builder: DocumentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-        val doc: Document? = builder.parse(input)
-        if (doc != null) {
-            val nl1: NodeList = doc.getElementsByTagName(tag[0])
-            val nl2: NodeList = doc.getElementsByTagName(tag[1])
-            if (nl1.length > 0) {
-                listOfGeopoints = ArrayList()
-                for (i in 0 until nl1.length) {
-                    val node1: Node = nl1.item(i)
-                    val node2: Node = nl2.item(i)
-                    val lat: Double = node1.textContent.toDouble()
-                    val lng: Double = node2.textContent.toDouble()
-                    listOfGeopoints.add(
-                        Barcode.GeoPoint(
-                            (lat * 1E6).toInt().toDouble(),
-                            (lng * 1E6).toInt().toDouble()
-                        )
-                    )
-                }
-            } else {
-                // No points found
-            }
-        }
-
-        return listOfGeopoints
     }
 
     fun dpToPx(dp: Int): Int {
@@ -244,5 +214,117 @@ object Utils {
                 )
             }
         }
+    }
+
+    /*
+    *  This method will copy file into app local folder. As from android -11 there is restriction
+    *  to load file from the storage
+    *
+    * */
+    fun copyFileToInternalStorage(
+        uri: Uri,
+        newDirName: String? = null, callback: StringCallBack
+    ): String? {
+        val returnCursor: Cursor = MainApp.getContext().contentResolver.query(
+            uri, arrayOf(
+                OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE
+            ), null, null, null
+        )!!
+
+
+        /*
+     * Get the column indexes of the data in the Cursor,
+     *     * move to the first row in the Cursor, get the data,
+     *     * and display it.
+     * */
+        val nameIndex: Int = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+        val sizeIndex: Int = returnCursor.getColumnIndex(OpenableColumns.SIZE)
+        returnCursor.moveToFirst()
+//        val name: String = returnCursor.getString(nameIndex)
+        val name: String = Consts.FILE_NAME
+        val size = returnCursor.getLong(sizeIndex).toString()
+        val output: File
+        output = File(MainApp.getContext().filesDir.toString() + "/" + name)
+
+        try {
+            val inputStream: InputStream? =
+                MainApp.getContext().contentResolver.openInputStream(uri)
+            val outputStream = FileOutputStream(output)
+            var read = 0
+            val bufferSize = 1024
+            val buffers = ByteArray(bufferSize)
+            while (inputStream?.read(buffers).also {
+                    if (it != null) {
+                        read = it
+                    }
+                } != -1) {
+                outputStream.write(buffers, 0, read)
+            }
+            inputStream?.close()
+            outputStream.close()
+
+            callback.onCallBack("Success")
+
+        } catch (e: Exception) {
+            e.message?.let { Log.e("Exception", it) }
+        }
+        return output.path
+    }
+
+    fun parseDate(parseDate: String): String {
+
+        var outDate = ""
+        val inFormat = SimpleDateFormat("dd/mm/yyyy")
+        val outFormat = SimpleDateFormat("yyyy/mm/dd")
+        try {
+            var date = inFormat.parse(parseDate)
+            var outDate = outFormat.format(date);
+            println("Out Date ->$outDate")
+            return outDate
+        } catch (e: ParseException) {
+            // incase there was a date parse issue
+            outDate = parseDateFallback(parseDate)
+            e.printStackTrace()
+        }
+
+        return outDate
+    }
+
+
+    fun parseDateFallback(dateStr: String): String {
+        var outDate = ""
+        val inFormat = SimpleDateFormat("yyyy-mm-dd")
+        val outFormat = SimpleDateFormat("yyyy/mm/dd")
+        try {
+            var date = inFormat.parse(dateStr)
+            var outDate = outFormat.format(date);
+            println("Out Date ->$outDate")
+            return outDate
+        } catch (e: ParseException) {
+            e.printStackTrace()
+        }
+        return outDate
+    }
+
+
+    /*
+    * Will get the file extension
+    * */
+    fun getMimeType(context: Context, uri: Uri): String? {
+        val extension: String
+
+        //Check uri format to avoid null
+        extension = if (uri.scheme == ContentResolver.SCHEME_CONTENT) {
+            //If scheme is a content
+            val mime: MimeTypeMap = MimeTypeMap.getSingleton()
+            mime.getExtensionFromMimeType(context.contentResolver.getType(uri)).toString()
+        } else {
+            //If scheme is a File
+            //This will replace white spaces with %20 and also other special characters. This will avoid returning null values on file name with spaces and special characters.
+            MimeTypeMap.getFileExtensionFromUrl(
+                Uri.fromFile(File(uri.path)).toString()
+            )
+        }
+        return extension
     }
 }
