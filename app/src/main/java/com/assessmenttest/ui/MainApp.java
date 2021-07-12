@@ -8,20 +8,13 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.multidex.MultiDexApplication;
 
-import com.assessmenttest.utility.Utils;
-
-import java.io.IOException;
-import java.security.GeneralSecurityException;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 public class MainApp extends MultiDexApplication implements Application.ActivityLifecycleCallbacks {
 
-
-//    @Inject
-//    DispatchingAndroidInjector<Activity> activityDispatchingAndroidInjector;
-
     private Activity mCurrentActivity;
     private static MainApp mMainApp;
-//    private BasicComponent mBasicComponent;
 
     @Override
     public void onCreate() {
@@ -30,15 +23,15 @@ public class MainApp extends MultiDexApplication implements Application.Activity
         if (mMainApp == null) {
             mMainApp = this;
         }
+
+        FirebaseApp.initializeApp(this);
+        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true);
     }
 
     public static MainApp getApplication() {
         return mMainApp;
     }
 
-//    public BasicComponent getBasicComponent() {
-//        return mBasicComponent;
-//    }
 
     public static Context getContext() {
         return mMainApp.getCurrentActivity() == null ? mMainApp.getApplicationContext() : mMainApp.getCurrentActivity();

@@ -27,11 +27,15 @@ import com.assessmenttest.ui.MainApp
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.apache.commons.lang.StringUtils
 import java.io.*
+import java.lang.reflect.Type
 import java.text.ParseException
 import java.text.SimpleDateFormat
 
@@ -41,63 +45,69 @@ object Utils {
     /*
     *  This method will import the CSV into local database
     * */
-    fun importCSVFromFile(){
 
-        var file = File(
-            MainApp.getContext().filesDir
-                .toString() + "/" + Consts.FILE_NAME
-        )
+    fun importCSV() {
 
-        val targetStream: InputStream = FileInputStream(file)
-        var reader =
-            BufferedReader(InputStreamReader(targetStream))
-        val csvReader =
-            CSVReader(reader)/* path of local storage (it should be your csv file locatioin)*/
-        var nextLine: Array<String>? = null
-        var rowCount = 0
-        GlobalScope.launch(Dispatchers.IO) {
-            do {
-                var value = ""
-                nextLine = csvReader.readNext()
-                nextLine?.toMutableList()
-                nextLine?.let { nextLine ->
+        GlobalScope.launch {
+            var rowCount = 0
+            try {
+                var file = File(
+                    MainApp.getContext().filesDir
+                        .toString() + "/" + Consts.FILE_NAME
+                )
 
-                    if (rowCount == 0) {
-                        // this part is for reading colum of each row
-                        var column = nextLine?.joinToString(
+
+                var ins = FileInputStream(file)
+                var csv = CSV(true, ',', ins)
+                var fieldNames: MutableList<String>? = null
+                if (csv.hasNext()) fieldNames = ArrayList(csv.next())
+                var list: MutableList<Map<String, String>> = ArrayList()
+                while (csv.hasNext()) {
+
+
+                    var rowList = csv.next()
+                    if (rowList.isNotEmpty()) {
+                        var obj = HashMap<String, String>()
+
+                        if (rowList.size == fieldNames?.size) {
+                            for (i in fieldNames?.indices!!) {
+                                Log.e("index", rowCount.toString())
+                                Log.e("value", rowList[i])
+
+                                var fieldName = ""
+                                fieldName = if (fieldNames[i].contains(" ")) {
+                                    fieldNames[i].replace(" ", "_")
+                                } else fieldNames[i]
+
+                                fieldNames?.set(i, fieldName.toLowerCase())
+                                obj[fieldNames[i]] = rowList[i]
+                            }
+                        }
+
+                        var columns = fieldNames?.joinToString(
                             separator = ","
                         )
-                    } else {
-                        // this part is for reading value of each row
-                        value = nextLine?.joinToString(
+
+                        var value = rowList?.joinToString(
                             prefix = "'",
                             separator = "','",
                             postfix = "'"
                         )
+                        pushTravellingData(columns, value)
+                        list.add(obj)
                     }
-
-                    if (rowCount >= 1) {
-                        if (!value.isNullOrEmpty()) {
-                            var convertedString = nextLine?.joinToString(
-                                prefix = "'",
-                                separator = "','",
-                                postfix = "'"
-                            )
-                            pushTravellingData(
-                                values = convertedString
-                            )
-                        }
-                    }
+                    rowCount++
                 }
-                rowCount++
-            } while ((nextLine) != null)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 
-    private suspend fun pushTravellingData(columns: StringBuilder? = null, values: String? = null) =
+    private suspend fun pushTravellingData(columns: String? = null, values: String? = null) =
         withContext(Dispatchers.IO) {
             val query = SimpleSQLiteQuery(
-                "INSERT INTO travelling (date,street,postal_code,city) values($values)",
+                "INSERT INTO travelling ($columns) values($values)",
                 arrayOf()
             )
 
@@ -240,7 +250,7 @@ object Utils {
         val nameIndex: Int = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
         val sizeIndex: Int = returnCursor.getColumnIndex(OpenableColumns.SIZE)
         returnCursor.moveToFirst()
-//        val name: String = returnCursor.getString(nameIndex)
+        val returnName: String = returnCursor.getString(nameIndex)
         val name: String = Consts.FILE_NAME
         val size = returnCursor.getLong(sizeIndex).toString()
         val output: File

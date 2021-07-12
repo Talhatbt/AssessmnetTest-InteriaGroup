@@ -20,9 +20,7 @@ import com.assessmenttest.helper.CallDialogs
 import com.assessmenttest.models.TravelDestinations
 import com.assessmenttest.models.TravellingData
 import com.assessmenttest.models.TravellingViewModel
-import com.assessmenttest.ui.MainActivity
 import com.assessmenttest.utility.Utils
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.text.DecimalFormat
@@ -33,9 +31,6 @@ class ShowDetailFragment : Fragment() {
     var listToSend = ArrayList<TravelDestinations>()
     lateinit var binding: FragmentShowDetailBinding
     lateinit var viewModel: TravellingViewModel
-    var loadData = 0
-    lateinit var callback: SimpleCallback<Any>
-
     var travellingList: MutableList<TravelDestinations> = ArrayList()
     lateinit var destinationAdapter: LastAdapter<TravelDestinations>
 
@@ -51,20 +46,10 @@ class ShowDetailFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().toolbar.visibility=View.GONE
+        init()
         setListener()
         setRecyclerview()
     }
-
-    override fun onResume() {
-        super.onResume()
-        if (travellingList.isEmpty()) {
-            CallDialogs.INSTANCE.showLoader(requireContext())
-            viewModel.fetchAllData()
-        } else destinationAdapter.items = travellingList
-
-    }
-
 
     @RequiresApi(Build.VERSION_CODES.N)
     private fun setListener() {
@@ -104,37 +89,35 @@ class ShowDetailFragment : Fragment() {
         /// Observer for getting the date list
         viewModel.allDateList.observe(requireActivity(), Observer {
 
-            if (loadData == 1) {
-                if (it.isNotEmpty()) {
-                    var travelList = ArrayList<TravellingData>()
+            if (it.isNotEmpty()) {
+                var travelList = ArrayList<TravellingData>()
 
-                    GlobalScope.launch {
+                GlobalScope.launch {
 
-                        // divide list in chunks in order to load the data of around 500 rows to reduce the time
-                        var chunkSize = it.size / 10
-                        var subLists: List<List<TravellingData>> = it.chunked(chunkSize)
-                        subLists.parallelStream().forEach { list ->
+                    // divide list in chunks in order to load the data of around 500 rows to reduce the time
+                    var chunkSize = it.size / 10
+                    var subLists: List<List<TravellingData>> = it.chunked(chunkSize)
+                    subLists.parallelStream().forEach { list ->
 
-                            list.forEachIndexed { index, element ->
-                                var points =
-                                    Utils.getLocationFromAddress(activity, it[index].street)
-                                element.geoPoints = points
-                                element.date = element.date?.let { date -> Utils.parseDate(date) }
-                                travelList.addAll(listOf(element))
-                                Log.e("index", index.toString())
-                            }
+                        list.forEachIndexed { index, element ->
+                            var points =
+                                Utils.getLocationFromAddress(activity, it[index].street)
+                            element.geoPoints = points
+                            element.date = element.date?.let { date -> Utils.parseDate(date) }
+                            travelList.addAll(listOf(element))
+                            Log.e("index", index.toString())
                         }
+                    }
 
-                        travelList.sortBy { item -> item.date }
-                        var list = calculateDistance(travelList)
-                        listToSend = list as ArrayList<TravelDestinations>
-                        Log.e("list size", travelList.size.toString())
+                    travelList.sortBy { item -> item.date }
+                    var list = calculateDistance(travelList)
+                    listToSend = list as ArrayList<TravelDestinations>
+                    Log.e("list size", travelList.size.toString())
 
-                        requireActivity().runOnUiThread {
-                            destinationAdapter.items = list
-                            destinationAdapter.notifyDataSetChanged()
-                            CallDialogs.INSTANCE.dismissDialog()
-                        }
+                    requireActivity().runOnUiThread {
+                        destinationAdapter.items = list
+                        destinationAdapter.notifyDataSetChanged()
+                        CallDialogs.INSTANCE.dismissDialog()
                     }
                 }
             }
@@ -143,11 +126,11 @@ class ShowDetailFragment : Fragment() {
 
     companion object {
         @JvmStatic
-        fun newInstance(viewModel: TravellingViewModel, loadData: Int,callback: SimpleCallback<Any>): ShowDetailFragment {
+        fun newInstance(
+            viewModel: TravellingViewModel
+        ): ShowDetailFragment {
             val fragment = ShowDetailFragment()
             fragment.viewModel = viewModel
-            fragment.loadData = loadData
-            fragment.callback = callback
             return fragment
         }
     }
@@ -210,10 +193,16 @@ class ShowDetailFragment : Fragment() {
     }
 
 
-    override fun onDetach() {
-        super.onDetach()
-        loadData = 0
-        callback.onCallBack(ArrayList())
-        viewModel.allDateList.removeObservers(this);
+    override fun onPause() {
+        super.onPause()
+        viewModel.allDateList.removeObservers(this)
+    }
+
+    private fun init() {
+        if (travellingList.isEmpty()) {
+            CallDialogs.INSTANCE.showLoader(requireContext())
+            viewModel.fetchAllData()
+        } else destinationAdapter.items = travellingList
+
     }
 }

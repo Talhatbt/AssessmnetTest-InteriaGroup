@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="distance"
+            type="String" />
+
+        <import type="android.view.View"/>
+        <variable
+            name="viewmodel"
+            type="com.assessmenttest.models.TravellingViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white_smoke"
+        android:clickable="true"
+        tools:context=".FirstFragment">
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnChooseFile"
+            android:layout_width="@dimen/_100sdp"
+            android:layout_height="@dimen/_40sdp"
+            android:text="Choose File"
+            android:visibility="@{viewmodel.listOfTravellingDates.size() >0 ? View.GONE :View.VISIBLE}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvNoFileChoosen" />
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvNoFileChoosen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_10sdp"
+            android:text="No input file. please choose file to continue"
+            android:textSize="@dimen/_20sdp"
+            android:visibility="@{viewmodel.listOfTravellingDates.size() >0 ? View.GONE :View.VISIBLE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnDetail"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_30sdp"
+            android:layout_margin="@dimen/_5sdp"
+            android:background="@color/forest_green"
+            android:text="Detail View"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_13sdp"
+            android:visibility="@{viewmodel.listOfTravellingDates.size() >0 ? View.VISIBLE :View.GONE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvTravel"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:visibility="@{viewmodel.listOfTravellingDates.size() >0 ? View.VISIBLE :View.GONE}"
+            app:items="@{viewmodel.listOfTravellingDates}"
+            app:layout_constraintBottom_toTopOf="@id/btnDetail"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

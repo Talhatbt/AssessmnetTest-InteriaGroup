@@ -153,7 +153,7 @@ class DrawRouteFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.Connec
 
     private fun setMarkersOnGoogleMap(listOfPoints: MutableList<TravellingData>) {
 
-        var size=listOfPoints.size-1
+        var size = listOfPoints.size - 1
         val markerOptionStart = MarkerOptions()
         listOfPoints[0].geoPoints?.let { markerOptionStart.position(it) }
         markerOptionStart.title(listOfPoints[0].postalCode)

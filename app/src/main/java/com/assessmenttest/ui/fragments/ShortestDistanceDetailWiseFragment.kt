@@ -45,28 +45,22 @@ class ShortestDistanceDetailWiseFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setListener()
 
 
         if (viewType == Consts.ViewType.SORTED_BY_SHORTEST_PATH) {
             setupShortestPathTravelledRecyclerview()
             processShortestPathData()
-            binding.llRow1.visibility=View.VISIBLE
-            binding.llRow2.visibility=View.GONE
+            binding.llRow1.visibility = View.VISIBLE
+            binding.llRow2.visibility = View.GONE
 
         } else {
             setupDistanceWiseRecyclerview()
             processDistanceWiseData()
-            binding.llRow1.visibility=View.GONE
-            binding.llRow2.visibility=View.VISIBLE
+            binding.llRow1.visibility = View.GONE
+            binding.llRow2.visibility = View.VISIBLE
         }
     }
 
-    private fun setListener() {
-        binding.btnBack.setOnClickListener {
-            callBack.onCallBack(returnList)
-        }
-    }
 
     companion object {
         @JvmStatic

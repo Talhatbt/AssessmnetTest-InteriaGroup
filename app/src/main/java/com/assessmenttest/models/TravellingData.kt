@@ -27,6 +27,10 @@ class TravellingData(
     var street: String? = "",
 
     @NonNull
+    @ColumnInfo(name = "address")
+    var address: String? = "",
+
+    @NonNull
     @ColumnInfo(name = "postal_code")
     var postalCode: String? = "",
 

@@ -68,6 +68,7 @@ fun AppCompatActivity.replaceFragment(
             addToBackStack(fragment.javaClass.name)
     }
 
+
 /**
  * add fragment
  * containerId -> fragment inflation container id

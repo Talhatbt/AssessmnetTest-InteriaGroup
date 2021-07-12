@@ -22,43 +22,10 @@
 
 
         <RelativeLayout
-            android:id="@+id/rlTop"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_40sdp"
-            android:background="@color/forest_green"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:elevation="@dimen/_10sdp"
-            android:text="kd"
-            android:textColor="@color/white"
-            android:textSize="@dimen/_15sdp"
-            app:layout_constraintBottom_toBottomOf="@id/rlTop"
-            app:layout_constraintEnd_toEndOf="@id/rlTop"
-            app:layout_constraintStart_toStartOf="@id/rlTop"
-            app:layout_constraintTop_toTopOf="@id/rlTop" />
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/btnBack"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/_10sdp"
-            android:background="@drawable/ic_baseline_arrow_back_24"
-            android:backgroundTint="@color/white"
-            app:layout_constraintBottom_toBottomOf="@id/rlTop"
-            app:layout_constraintStart_toStartOf="@id/rlTop"
-            app:layout_constraintTop_toTopOf="@id/rlTop" />
-
-        <RelativeLayout
             android:id="@+id/relative"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/rlTop">
+            app:layout_constraintTop_toTopOf="parent">
 
             <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/llRow1"

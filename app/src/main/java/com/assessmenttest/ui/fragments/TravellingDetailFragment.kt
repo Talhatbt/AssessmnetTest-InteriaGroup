@@ -32,7 +32,6 @@ import com.assessmenttest.extensions.replaceFragment
 import com.assessmenttest.helper.CallDialogs
 import com.assessmenttest.models.TravellingData
 import com.assessmenttest.models.TravellingViewModel
-import com.assessmenttest.ui.MainActivity
 import com.assessmenttest.utility.Utils
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -68,7 +67,7 @@ class TravellingDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        requireActivity().toolbar.visibility=View.GONE
+        requireActivity().toolbar.visibility = View.GONE
         binding.distance = getString(R.string.loading)
         setListener()
         setRecyclerview()
@@ -227,7 +226,7 @@ class TravellingDetailFragment : Fragment() {
 
     companion object {
         @JvmStatic
-        fun newInstance(date: String,callback: SimpleCallback<Any>): TravellingDetailFragment {
+        fun newInstance(date: String, callback: SimpleCallback<Any>): TravellingDetailFragment {
             val fragment = TravellingDetailFragment()
             fragment.date = date
             fragment.callback = callback

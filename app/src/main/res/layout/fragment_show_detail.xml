@@ -106,9 +106,9 @@
                 android:layout_marginStart="@dimen/_5sdp"
                 android:layout_weight="1"
                 android:elevation="@dimen/_10sdp"
+                android:gravity="center"
                 android:maxLines="2"
                 android:text="Address"
-                android:gravity="center"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_10sdp" />
 
@@ -143,12 +143,12 @@
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnRouteDetail"
             android:layout_width="0dp"
-            android:layout_height="@dimen/_40sdp"
+            android:layout_height="@dimen/_35sdp"
             android:layout_margin="@dimen/_5sdp"
             android:background="@color/forest_green"
             android:text="Route Details"
-            android:textSize="@dimen/_13sdp"
             android:textColor="@color/white"
+            android:textSize="@dimen/_13sdp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/btnTravelDetail"
             app:layout_constraintStart_toStartOf="parent" />
@@ -156,15 +156,26 @@
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnTravelDetail"
             android:layout_width="0dp"
-            android:layout_height="@dimen/_40sdp"
+            android:layout_height="@dimen/_35sdp"
             android:layout_margin="@dimen/_5sdp"
-            android:textColor="@color/white"
             android:background="@color/forest_green"
             android:text="Sort By Distance"
+            android:textColor="@color/white"
             android:textSize="@dimen/_13sdp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/btnRouteDetail" />
+
+
+        <FrameLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:context=".ui.activities.MainActivity" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
